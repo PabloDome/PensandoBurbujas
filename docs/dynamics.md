@@ -8,7 +8,7 @@ $$
 $$
 with cyclic conditions.
 
-To solve the former system, we will use numerical algorithms, particularly one of the so-called _Leap-frog_ schemes: the kick-drift-kick_. This integration method propose the following scheme:
+To solve the former system, we will use numerical algorithms, particularly one of the so-called _Leap-frog_ schemes: the _kick-drift-kick_. This integration method propose the following scheme:
 
 * The second-order $n$ equations are is splitted into $2n$ first-order differential equations
 $$
@@ -26,3 +26,7 @@ x_{i+1}   & = x_{i}+v_{i+1/2}\Delta t,\\
 v_{i+1}   & = v_{i+1/2}+a_{i+1}{\frac {\Delta t}{2}},
 \end{align}
 $$
+
+## Dummy problem
+
+If we consider a circular initial state at rest, an let evolve all the particles, we have that evolution will be completely isotropically towards the center.
