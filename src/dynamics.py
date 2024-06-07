@@ -102,3 +102,5 @@ if __name__ == '__main__':
                    **history_conf
                    )
     print(ev)
+
+    exit()
