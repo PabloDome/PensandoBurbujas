@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def plot_particles_and_forces(r,f):
-    plt.figure(figsize=(6,6))
+    fig = plt.figure(figsize=(6,6))
     plt.scatter(r[0,:],r[1,:])
     plt.quiver(r[0,:],r[1,:],f[0,:],f[1,:])
-    plt.show()
+    return fig
 
 def get_accel_zero_rest_distance(r, k_over_m):
     '''
@@ -21,7 +21,7 @@ def get_accel_zero_rest_distance(r, k_over_m):
     accel = -k_over_m*(2*r-new_r[:,:-2]-new_r[:,2:])
     return accel
 
-def get_accel_zero_rest_distance_drag_0(r, v, k_over_m, drag_over_m):
+def get_accel_zero_rest_distance_drag(r, v, k_over_m, drag_over_m):
     '''
     this function calculate the forces for each particle
     considering constrains as springs. All springs are identical
@@ -38,10 +38,10 @@ def get_accel_zero_rest_distance_drag_0(r, v, k_over_m, drag_over_m):
     return accel
 
 def kick_drift_kick_step(r, v, k, drag, dt):
-    a_old  = get_accel_zero_rest_distance_drag_0(r, v, k, drag)
+    a_old  = get_accel_zero_rest_distance_drag(r, v, k, drag)
     v_half = v + a_old * dt/2
     r_new  = r + v_half * dt
-    a_new  = get_accel_zero_rest_distance_drag_0(r_new, v_half, k, drag)
+    a_new  = get_accel_zero_rest_distance_drag(r_new, v_half, k, drag)
     v_new  = v_half + a_new * dt/2
     return r_new, v_new
 
@@ -55,14 +55,15 @@ def perturb_distribution(x, std):
     x = rng.normal(x, std)
     return x 
 
+
 def evolve(r, v, k_m, drag_m, dt, steps, **history):
     print(history)
     if history['value'] == True:
         v_dist = np.sqrt(v[0,:]**2+v[1,:]**2)
         r_dist = np.sqrt(r[0,:]**2+r[1,:]**2)
 
-        v_mod = [[v_dist.mean(), v_dist.std()]]
-        r_mod = [[r_dist.mean(), r_dist.std()]]
+        v_mod = np.array([[v_dist.mean(), v_dist.std()]])
+        r_mod = np.array([[r_dist.mean(), r_dist.std()]])
         if history['particles'] != 0:
             particles = np.random.choice(np.arange(len(r[0,:])),size=history['particles'])
             traces = np.hstack([r[:,i] for i in particles])
@@ -73,13 +74,14 @@ def evolve(r, v, k_m, drag_m, dt, steps, **history):
         r, v = kick_drift_kick_step(r, v, k_m, drag_m, dt)
         
         if history['value'] ==  True:
-            v_dist = np.sqrt(v[0,:]**2+v[1,:]**2)
-            r_dist = np.sqrt(r[0,:]**2+r[1,:]**2)
-            v_mod.append([v_dist.mean(), v_dist.std()])
-            r_mod.append([r_dist.mean(), r_dist.std()])
+            if i % history['every'] == 0: 
+                v_dist = np.sqrt(v[0,:]**2+v[1,:]**2)
+                r_dist = np.sqrt(r[0,:]**2+r[1,:]**2)
+                v_mod = np.vstack([v_mod, np.array([v_dist.mean(), v_dist.std()])])
+                r_mod = np.vstack([r_mod, np.array([r_dist.mean(), r_dist.std()])])
 
-            if history['particles'] != 0:
-                traces = np.vstack([traces, np.hstack([r[:,i] for i in particles])])
+                if history['particles'] != 0:
+                    traces = np.vstack([traces, np.hstack([r[:,i] for i in particles])])
 
     if history['value'] == True:
         return r, v, r_mod, v_mod, traces
@@ -87,20 +89,50 @@ def evolve(r, v, k_m, drag_m, dt, steps, **history):
         return r, v
     
 
+def plot_mean_values(r_mod, v_mod):
+    '''
+    This function returns a fig with rmod and vmod
+    You must provide (n_steps, 2) arrays for each magnitude
+    '''
+    fig, axs = plt.subplots(1,2, figsize=(12,6))
+    fig.suptitle('Mean Values')
+    data = np.stack([r_mod.reshape(1,-1,2)[0], v_mod], axis=0)
+    labels = ['<r>','<v>']
+    for i in range(2):
+        mv = np.array(data[i,:,0])
+        sv = np.array(data[i,:,1])
+        axs[i].plot(mv, label=labels[i])
+        axs[i].fill_between(np.arange(len(mv)),mv-sv,mv+sv, alpha = 0.25 )
+        axs[i].legend()
+    return fig
+
+def plot_trajs(trajs):
+    n_particles = trajs.shape[1]//2
+    fig = plt.figure(figsize=(6,6))
+    for i in range(n_particles):
+        plt.plot(trajs[:, 2*i], trajs[:, 2*i+1])
+    return fig
+
+
+
 if __name__ == '__main__':
     from geometry import get_poligon
-    x,y = get_poligon(n = 12, R0=1.)
+    x,y = get_poligon(n = 5000, R0=1.)
     r = np.vstack([x,y])
-    r = perturb_distribution(r, 0.05)
+    r = perturb_distribution(r, 0.02)
     x,y = r[0,:], r[1,:]
     v = np.zeros_like(r)
-    a = get_accel_zero_rest_distance_drag_0(r, v, 0.1, 0.01)
-    plot_particles_and_forces(r,a)
-    history_conf = {'value':True, 'particles': 3}
-    ev = evolve(r, v, k_m= 0.1, drag_m= 0.01, dt = 0.1,
-                   steps=3000,
+    a = get_accel_zero_rest_distance_drag(r, v, 0.15, 0.)
+    figura = plot_particles_and_forces(r,a)
+    plt.show()
+    history_conf = {'value':True, 'particles': 3, 'every':100}
+    ev = evolve(r, v, k_m = 0.1, drag_m= 0., dt = 0.1,
+                   steps = 100000,
                    **history_conf
                    )
-    print(ev)
 
-    exit()
+    figura = plot_mean_values(ev[2], ev[3])
+    plt.show()
+
+    figura = plot_trajs(ev[4])
+    plt.show()
