@@ -8,7 +8,7 @@ program n_springs
     real(8) :: r_mean, r_std, v_mean, v_std
 
     n_dim = 2
-    n_particles = 20
+    n_particles = 5
     R0 = 1d0
 
     allocate(r0_vec(n_particles, n_dim), r_vec(n_particles, n_dim))
@@ -23,7 +23,7 @@ program n_springs
         write(100,*)r0_vec(i,1), r0_vec(i,2), v0_vec(i,1), v0_vec(i,2), a_vec(i,1), a_vec(i,2)
     end do
 
-    do i = 1, 1000000
+    do i = 1, 100000
         call evolve_one_step(0.05d0, 0.1d0, 0.1d0, 0.1d0, 0)
         call get_mean_values(r_mean, r_std, v_mean, v_std)
         write(200,*) r_mean, r_std, v_mean, v_std
