@@ -26,7 +26,7 @@ module initial_conditions
             call geometry()
             if (is_noise) then
                 call random_number(disturb)
-                r0_vec = r0_vec + factor * disturb
+                r0_vec = r0_vec + factor * (disturb-0.5d0)
             end if
             v0_vec = 0d0
         end subroutine
