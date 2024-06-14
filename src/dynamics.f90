@@ -17,11 +17,14 @@ contains
         new_r(0,:) = r_vec(n_particles,:)
         new_r(n_particles+1,:) = r_vec(1,:) 
 
+        
         r_vector = (2*r_vec-new_r(0:n_particles-1,:)-new_r(2:n_particles+1,:))
+        ! do i = 1, n_particles
+        !     r_versor(i,:) = r_vector(i,:)/dsqrt(dot_product(r_vector(i,:),r_vector(i,:))+1d-20)
+        ! end do
         do i = 1, n_particles
-            r_versor(i,:) = r_vector(i,:)/dsqrt(dot_product(r_vector(i,:),r_vector(i,:)))
+            r_versor(i,:) = r_vec(i,:)/dsqrt(dot_product(r_vec(i,:),r_vec(i,:))+1d-20)
         end do
-
         a_vec = -k_m*r_vector
         a_vec = a_vec - drag_m * v_vec
         a_vec = a_vec + pressure*r_versor

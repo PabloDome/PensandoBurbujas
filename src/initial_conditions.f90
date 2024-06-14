@@ -19,9 +19,15 @@ module initial_conditions
             end do
         end subroutine
 
-        subroutine set_initial()
-
+        subroutine set_initial(is_noise, factor)
+            implicit none
+            logical :: is_noise
+            real(8) :: factor, disturb(n_particles, n_dim)
             call geometry()
+            if (is_noise) then
+                call random_number(disturb)
+                r0_vec = r0_vec + factor * disturb
+            end if
             v0_vec = 0d0
         end subroutine
 
