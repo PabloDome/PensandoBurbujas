@@ -19,7 +19,7 @@ program n_springs
     allocate(v_vec(n_particles, n_dim), v0_vec(n_particles, n_dim))
     allocate(a_vec(n_particles, n_dim))
 
-    call set_initial(.False., 0.25d0) ! distribuye las partículas en un poligono
+    call set_initial(.True., 0.05d0) ! distribuye las partículas en un poligono
     r_vec = r0_vec
     call calculate_accel()
     do i = 1, n_particles
