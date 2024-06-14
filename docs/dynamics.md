@@ -3,9 +3,7 @@
 ## Pure harmonic forces
 Here we explore the dynamics of the particle system. For this system with $N$ masses equal to ${m}$ and coordinates ${\mathbf{r}_i}$, we will suppose that particles are bounded with springs with constant $k$ and zero rest position for the harmonic forces. This lead to the following coupled system of differential equations:
 $$
-
-    m \ddot{\mathbf{r}}_i = -k \left(2\mathbf{r}_i-\mathbf{r}_{i-1} -\mathbf{r}_{i+1} \right),
-
+m \ddot{\mathbf{r}}_i = -k \left(2\mathbf{r}_i-\mathbf{r}_{i-1} -\mathbf{r}_{i+1} \right),
 $$
 with cyclic conditions.
 
