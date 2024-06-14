@@ -11,7 +11,7 @@ program n_springs
     n_particles = 500
     R0 = 1d0
     k_m = 0.1d0
-    drag_m = 2d0
+    drag_m = 0d0
 
 
 
@@ -19,15 +19,15 @@ program n_springs
     allocate(v_vec(n_particles, n_dim), v0_vec(n_particles, n_dim))
     allocate(a_vec(n_particles, n_dim))
 
-    call set_initial(.True., 0.25d0) ! distribuye las partículas en un poligono
+    call set_initial(.False., 0.25d0) ! distribuye las partículas en un poligono
     r_vec = r0_vec
     call calculate_accel()
     do i = 1, n_particles
         write(100,*)r_vec(i,1), r_vec(i,2)
     end do
 
-    pressure = 0.1d0
-    do i = 1, 30000
+    pressure = 0d0
+    do i = 1, 20000
         call evolve_one_step(0.01d0, 1)
         call get_mean_values(r_mean, r_std, v_mean, v_std)
         if(mod(i, 100) == 0) then
@@ -41,7 +41,7 @@ program n_springs
     end do
 
 
-    pressure = -0.1d0
+    pressure = -0d0
     do i = 1, 30000
         call evolve_one_step(0.01d0, 1)
         call get_mean_values(r_mean, r_std, v_mean, v_std)
@@ -56,7 +56,7 @@ program n_springs
     end do
 
     pressure = 0d0
-    do i = 1, 1000000
+    do i = 1, 100000
         call evolve_one_step(0.01d0, 1)
         call get_mean_values(r_mean, r_std, v_mean, v_std)
         if(mod(i, 100) == 0) then
