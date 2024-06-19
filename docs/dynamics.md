@@ -51,11 +51,23 @@ $$
 m \ddot{\mathbf{r}}_i = -k (2\mathbf{r}_i-\mathbf{r}_{i-1} -\mathbf{r}_{i+1} ) - b \mathbf{v}_i + \lambda \hat{\mathbf{r}}_i.
 $$
 
-In the former Equation, $\lambda$ is a constant and $\hat{\mathbf{r}}_i$ the unitary vector in the radial direction. Here, to enhance the effects of the external force over those of elastic and drag forces we use $b=0.5$ for $\lambda = 0.0000175$. 
-
-In the first row we show a weak external force, this lead to oscillating movement (even with a large drag force). 
-> The second row shows that **we need to redefine the external force related to the center of mass**
+In the former Equation, $\lambda$ is a constant and $\hat{\mathbf{r}}_i$ the unitary vector in the radial direction. Here, we show in the first row $b=0.5$ and $\lambda = 0.0001$. In the second row we show results for initial random distribution.
 
 Particles at four instants  |  Mean value of r as function of time | Mean value of velocity as function of time
 :------------------:|:------------:|:------:|
+![](image-15.png)   | ![](image-16.png) | ![](image-17.png)
+![](image-20.png)   | ![](image-19.png) |![](image-18.png)
+
+In the following we analyze the behavior of the velocity as function of the external force parameter $\lambda$. In this case we turn on the external force for $N_t = 50000$ timesteps, then, we turn off the external force in order to examine the relaxation. 
+
+ 
+
+| $\lambda = 0.0001$| $\lambda = 0.0002$ | $\lambda = 0.0003$ | $\lambda = 0.0005$ | $\lambda = 0.0007$ | $\lambda = 0.001$ |
+|:---------:|:---------:|:------:|:------:|:------:|:------:|
+![0.0001](image-21.png) |![0.0002](image-22.png) | ![0.0003](image-23.png) | ![0.0005](image-24.png) | ![0.0007](image-25.png)| ![0.0010](image-26.png)
+
+If we plot the max velocity as function of the external force parameter $\lambda$, we see a linear behavior as shown in the following Figure
+
+![](image-27.png)
+
 

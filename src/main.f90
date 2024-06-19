@@ -12,7 +12,7 @@ program n_springs
     R0 = 1d0
     k_m = 0.1d0
     drag_m = 0.5d0
-    disorder_0 = 0.d0
+    disorder_0 = 0.2d0
 
 
 
@@ -27,11 +27,11 @@ program n_springs
         write(100,*)r_vec(i,1), r_vec(i,2)
     end do
 
-    pressure = 0.0000165d0
-    do i = 1, 10000000
+    pressure = 0.01d0
+    do i = 1, 10000
         call evolve_one_step(0.01d0, 1)
         call get_mean_values(r_mean, r_std, v_mean, v_std)
-        if(mod(i, 100) == 0) then
+        if(mod(i, 10) == 0) then
             write(200,*) r_mean, r_std, v_mean, v_std
         end if
     end do
@@ -41,12 +41,11 @@ program n_springs
         write(300,*)r_vec(i,1), r_vec(i,2)
     end do
 
-
-    ! pressure = 0d0
-    do i = 1, 100000
+    pressure = -0.01d0
+    do i = 1, 10000
         call evolve_one_step(0.01d0, 1)
         call get_mean_values(r_mean, r_std, v_mean, v_std)
-        if(mod(i, 100) == 0) then
+        if(mod(i, 10) == 0) then
             write(200,*) r_mean, r_std, v_mean, v_std
         end if
     end do
@@ -57,10 +56,10 @@ program n_springs
     end do
 
     ! pressure = 0d0
-    do i = 1, 20000
+    do i = 1, 2000
         call evolve_one_step(0.01d0, 1)
         call get_mean_values(r_mean, r_std, v_mean, v_std)
-        if(mod(i, 100) == 0) then
+        if(mod(i, 10) == 0) then
             write(200,*) r_mean, r_std, v_mean, v_std
         end if
     end do
