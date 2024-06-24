@@ -13,6 +13,12 @@ program n_springs
     k_m = 0.1d0
     drag_m = 0.5d0
     disorder_0 = 0.2d0
+    n_disorder = 100
+    n_grad_disorder = 1000
+    grid_disorder_min = -3d0
+    grid_disorder_max = 3d0
+    pot_max = 1d0
+    pot_width = 1d0
 
 
 
