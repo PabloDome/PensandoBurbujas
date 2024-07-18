@@ -13,7 +13,7 @@ module initial_conditions
             angle = pi - alpha   !The minimum invariant rotation angle 
             r0_vec = 0d0
             do i = 1, n_particles
-                theta = (i-1) * angle
+                theta = dble(i-1) * angle
                 r0_vec(i,1) = R0 * dcos(theta)
                 r0_vec(i,2) = R0 * dsin(theta)
             end do

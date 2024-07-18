@@ -1,5 +1,6 @@
 module dynamics
     use global
+    use disorder
     implicit none
 
     
@@ -7,29 +8,34 @@ contains
     subroutine calculate_accel()
         implicit none
         integer :: i
-        real(8), dimension(:,:), allocatable :: new_r, r_versor, r_vector
+        real(8), dimension(:,:), allocatable :: new_r, r_versor, r_vector, disforce
 
         allocate(new_r(0:n_particles+1, n_dim))
         allocate(r_versor(n_particles,n_dim))
         allocate(r_vector(n_particles,n_dim))
+        allocate(disforce(n_particles,n_dim))
         ! Cyclic condition for particles
         new_r(1:n_particles,:) = r_vec
         new_r(0,:) = r_vec(n_particles,:)
         new_r(n_particles+1,:) = r_vec(1,:) 
 
         
-        r_vector = (2*r_vec-new_r(0:n_particles-1,:)-new_r(2:n_particles+1,:))
+        r_vector = (2d0*r_vec-new_r(0:n_particles-1,:)-new_r(2:n_particles+1,:))
         ! do i = 1, n_particles
         !     r_versor(i,:) = r_vector(i,:)/dsqrt(dot_product(r_vector(i,:),r_vector(i,:))+1d-20)
         ! end do
         do i = 1, n_particles
             r_versor(i,:) = r_vec(i,:)/dsqrt(dot_product(r_vec(i,:),r_vec(i,:))+1d-20)
+            call disorder_force(r_vec(i,:),disforce(i,:))
         end do
         a_vec = -k_m*r_vector
         a_vec = a_vec - drag_m * v_vec
         a_vec = a_vec + pressure*r_versor
+        a_vec = a_vec + disforce
+        
         deallocate(new_r)
         deallocate(r_versor)
+        deallocate(disforce)
     end subroutine
 
     subroutine evolve_one_step(dt, method)
@@ -38,11 +44,11 @@ contains
         integer :: method
         if ( method == 0 ) then     !verlet algorithm
             call calculate_accel()
-            v_vec = v_vec + a_vec * dt/2
+            v_vec = v_vec + a_vec * dt/2d0
             r_vec  = r_vec + v_vec * dt
             call calculate_accel()
-            v_vec  = v_vec + a_vec * dt/2
-        elseif (method == 1) then
+            v_vec  = v_vec + a_vec * dt/2d0
+        elseif (method == 1) then   ! rk4 algorithm
             q_vec(:,1:n_dim) = r_vec
             q_vec(:, n_dim+1:2*n_dim) = v_vec
             call rk4(q_vec, 0d0, dt, y_out)
