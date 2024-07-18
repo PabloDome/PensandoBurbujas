@@ -2,7 +2,7 @@ module disorder
     use global
     implicit none
     integer, parameter :: n_disorder = 1000
-    real(8), parameter :: disorder_amplitude = 0.2d0, disorder_width=0.02d0
+    real(8), parameter :: disorder_amplitude = 0.15d0, disorder_width=0.03d0
     real(8), dimension(:,:) :: disorder_centers(n_disorder,2)
     real(8), dimension(:) :: disorder_values(n_disorder)
 

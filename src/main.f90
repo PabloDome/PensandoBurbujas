@@ -11,9 +11,9 @@ program n_springs
     n_dim = 2
     n_particles = 500
     R0 = 1d0
-    k_m = 0.1d0
-    drag_m = 0.01d0
-    disorder_0 = 0.d0
+    k_m = 0.5d0
+    drag_m = 0.05d0
+    disorder_0 = 0.1d0
 
     allocate(r0_vec(n_particles, n_dim), r_vec(n_particles, n_dim))
     allocate(v_vec(n_particles, n_dim), v0_vec(n_particles, n_dim))
@@ -69,7 +69,7 @@ program n_springs
     end do
 
     pressure = 0d0
-    do i = 1, 10000
+    do i = 1, 20000
         call evolve_one_step(0.01d0, 1)
         call get_mean_values(r_mean, r_std, v_mean, v_std)
         if(mod(i, 10) == 0) then
