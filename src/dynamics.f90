@@ -24,10 +24,15 @@ contains
         ! do i = 1, n_particles
         !     r_versor(i,:) = r_vector(i,:)/dsqrt(dot_product(r_vector(i,:),r_vector(i,:))+1d-20)
         ! end do
-        do i = 1, n_particles
-            r_versor(i,:) = r_vec(i,:)/dsqrt(dot_product(r_vec(i,:),r_vec(i,:))+1d-20)
-            call disorder_force(r_vec(i,:),disforce(i,:))
-        end do
+
+        ! ! static dirorder
+        ! do i = 1, n_particles
+        !     r_versor(i,:) = r_vec(i,:)/dsqrt(dot_product(r_vec(i,:),r_vec(i,:))+1d-20)
+        !     call disorder_force(r_vec(i,:),disforce(i,:))
+        ! end do
+
+        call random_forces(disforce)
+        
         a_vec = -k_m*r_vector
         a_vec = a_vec - drag_m * v_vec
         a_vec = a_vec + pressure*r_versor

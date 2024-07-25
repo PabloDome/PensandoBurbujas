@@ -2,7 +2,7 @@ module disorder
     use global
     implicit none
     integer, parameter :: n_disorder = 1000
-    real(8), parameter :: disorder_amplitude = 0.15d0, disorder_width=0.03d0
+    real(8), parameter :: disorder_amplitude = 0.05d0, disorder_width=0.01d0
     real(8), dimension(:,:) :: disorder_centers(n_disorder,2)
     real(8), dimension(:) :: disorder_values(n_disorder)
 
@@ -42,4 +42,12 @@ contains
             force = force + disorder_values(i) * d * dexp(-dot_product(d,d)/2d0/disorder_width**2)
         end do
     end subroutine
+
+    subroutine random_forces(force)
+        implicit none
+        real(8), intent(out) :: force(n_particles, n_dim)
+        call random_number(force)
+        force = force * 0.005
+    end subroutine
+
 end module disorder

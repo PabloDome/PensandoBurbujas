@@ -9,7 +9,7 @@ program n_springs
     real(8) :: r_mean, r_std, v_mean, v_std, disorder_0, pot, force(2)
 
     n_dim = 2
-    n_particles = 500
+    n_particles = 200
     R0 = 1d0
     k_m = 0.5d0
     drag_m = 0.05d0
@@ -74,6 +74,11 @@ program n_springs
         call get_mean_values(r_mean, r_std, v_mean, v_std)
         if(mod(i, 10) == 0) then
             write(200,*) r_mean, r_std, v_mean, v_std
+        end if
+        if (mod(i,2000) == 0) then
+            do j = 1, n_particles
+                write(i,*)r_vec(j,1), r_vec(j,2)
+            end do
         end if
     end do
     do i = 1, n_particles
