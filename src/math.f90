@@ -12,6 +12,6 @@ module math
             r_std = dsqrt(sum( (dsqrt(r_vec(:,1)**2d0+r_vec(:,2)**2d0) - r_mean)**2)/dble(n_particles))
             v_mean = sum(dsqrt(v_vec(:,1)**2d0+v_vec(:,2)**2d0))/dble(n_particles)
             v_std = dsqrt(sum( (dsqrt(v_vec(:,1)**2d0+v_vec(:,2)**2d0) - v_mean)**2)/dble(n_particles))
-
         end subroutine
-end module math
+        
+    end module math

@@ -5,6 +5,12 @@ module dynamics
 
     
 contains
+    subroutine get_r_cm()
+        implicit none
+        r_cm(1) = sum(r_vec(:,1))/n_particles
+        r_cm(2) = sum(r_vec(:,2))/n_particles
+    end subroutine
+
     subroutine calculate_accel()
         implicit none
         integer :: i
@@ -19,8 +25,18 @@ contains
         new_r(0,:) = r_vec(n_particles,:)
         new_r(n_particles+1,:) = r_vec(1,:) 
 
-        
+
+        ! vector (extension) for the elastic force (rest position in zero)
         r_vector = (2d0*r_vec-new_r(0:n_particles-1,:)-new_r(2:n_particles+1,:))
+
+        !direction of each particle from the center of mass
+        call get_r_cm()
+        do i =1, n_particles
+            r_versor(i,:) = r_vec(i,:) - r_cm
+            r_versor(i,:)= r_versor(i,:)/dsqrt(dot_product(r_versor(i,:),r_versor(i,:))+1d-20)
+        end do
+
+
         ! do i = 1, n_particles
         !     r_versor(i,:) = r_vector(i,:)/dsqrt(dot_product(r_vector(i,:),r_vector(i,:))+1d-20)
         ! end do
@@ -31,12 +47,13 @@ contains
         !     call disorder_force(r_vec(i,:),disforce(i,:))
         ! end do
 
-        call random_forces(disforce)
+        ! call random_forces(disforce)
         
         a_vec = -k_m*r_vector
         a_vec = a_vec - drag_m * v_vec
+        ! pressure is applied in the center of mass direction
         a_vec = a_vec + pressure*r_versor
-        a_vec = a_vec + disforce
+        ! a_vec = a_vec + disforce
         
         deallocate(new_r)
         deallocate(r_versor)

@@ -17,7 +17,7 @@ program n_springs
 
     allocate(r0_vec(n_particles, n_dim), r_vec(n_particles, n_dim))
     allocate(v_vec(n_particles, n_dim), v0_vec(n_particles, n_dim))
-    allocate(a_vec(n_particles, n_dim))
+    allocate(a_vec(n_particles, n_dim), r_cm(n_dim))
 
     
     ! Creating random forces 
@@ -39,6 +39,10 @@ program n_springs
     do i = 1, n_particles
         write(100,*)r_vec(i,1), r_vec(i,2)
     end do
+    call get_r_cm()
+    print*,'initial with noise', r_cm
+
+
 
     pressure = 0.005d0
     do i = 1, 2000
@@ -49,11 +53,12 @@ program n_springs
         end if
     end do
     print*,'presure turned off'
-
     do i = 1, n_particles
         write(300,*)r_vec(i,1), r_vec(i,2)
     end do
-
+    call get_r_cm()
+    print*,'after expansion', r_cm
+    stop
     pressure = -0.005d0
     do i = 1, 2000
         call evolve_one_step(0.01d0, 1)
@@ -63,6 +68,7 @@ program n_springs
         end if
     end do
     print*,'presure turned off'
+
 
     do i = 1, n_particles
         write(400,*)r_vec(i,1), r_vec(i,2)

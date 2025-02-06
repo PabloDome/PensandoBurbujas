@@ -1,6 +1,7 @@
 module initial_conditions
     use global
     use math
+    use dynamics
     implicit none
     real(8) :: R0
     
@@ -22,12 +23,19 @@ module initial_conditions
         subroutine set_initial(is_noise, factor)
             implicit none
             logical :: is_noise
+            integer :: i
             real(8) :: factor, disturb(n_particles, n_dim)
             call geometry()
             if (is_noise) then
                 call random_number(disturb)
                 r0_vec = r0_vec + factor * (disturb-0.5d0)
             end if
+            r_vec = r0_vec
+            call get_r_cm()
+            do i = 1, n_particles
+                r_vec(i,:) = r_vec(i,:) -r_cm
+            end do
+            r0_vec = r_vec
             v0_vec = 0d0
         end subroutine
 
