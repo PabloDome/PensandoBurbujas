@@ -6,20 +6,25 @@ program n_springs
     use disorder
     implicit none
     integer:: i, j
-    real(8) :: r_mean, r_std, v_mean, v_std, disorder_0, pot, force(2)
+    real(8) :: r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean, disorder_0, pot, force(2)
+    real(8) :: n1,n2
 
     n_dim = 2
     n_particles = 200
     R0 = 1d0
     k_m = 0.5d0
-    drag_m = 0.05d0
+    drag_m = 0.5d0
     disorder_0 = 0.1d0
 
     allocate(r0_vec(n_particles, n_dim), r_vec(n_particles, n_dim))
     allocate(v_vec(n_particles, n_dim), v0_vec(n_particles, n_dim))
-    allocate(a_vec(n_particles, n_dim), r_cm(n_dim))
+    allocate(a_vec(n_particles, n_dim), r_cm(n_dim), v_cm(n_dim))
 
-    
+    do i =1, 100000
+        call boxmuller(n1)
+        write(1000,*) n1
+    end do
+    stop
     ! Creating random forces 
     call fill_potential_centres()
     !for plotting purposes
@@ -44,12 +49,12 @@ program n_springs
 
 
 
-    pressure = 0.005d0
-    do i = 1, 2000
+    pressure = 0.1d0
+    do i = 1, 10000
         call evolve_one_step(0.01d0, 1)
-        call get_mean_values(r_mean, r_std, v_mean, v_std)
-        if(mod(i, 10) == 0) then
-            write(200,*) r_mean, r_std, v_mean, v_std
+        call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
+        if(mod(i, 1) == 0) then
+            write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
         end if
     end do
     print*,'presure turned off'
@@ -57,14 +62,31 @@ program n_springs
         write(300,*)r_vec(i,1), r_vec(i,2)
     end do
     call get_r_cm()
-    print*,'after expansion', r_cm
+    print*,'after expansion 1', r_cm
+
+    pressure = 0.0d0
+    do i = 1, 20000
+        call evolve_one_step(0.01d0, 1)
+        call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
+        if(mod(i, 1) == 0) then
+            write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
+        end if
+    end do
+
+    do i = 1, n_particles
+        write(400,*)r_vec(i,1), r_vec(i,2)
+    end do
+    call get_r_cm()
+    print*,'after expansion 2', r_cm
     stop
+
+
     pressure = -0.005d0
     do i = 1, 2000
         call evolve_one_step(0.01d0, 1)
-        call get_mean_values(r_mean, r_std, v_mean, v_std)
-        if(mod(i, 10) == 0) then
-            write(200,*) r_mean, r_std, v_mean, v_std
+        call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
+        if(mod(i, 1) == 0) then
+            write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
         end if
     end do
     print*,'presure turned off'
@@ -77,9 +99,9 @@ program n_springs
     pressure = 0d0
     do i = 1, 20000
         call evolve_one_step(0.01d0, 1)
-        call get_mean_values(r_mean, r_std, v_mean, v_std)
-        if(mod(i, 10) == 0) then
-            write(200,*) r_mean, r_std, v_mean, v_std
+        call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
+        if(mod(i, 1) == 0) then
+            write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
         end if
         if (mod(i,2000) == 0) then
             do j = 1, n_particles

@@ -9,6 +9,14 @@ contains
         implicit none
         r_cm(1) = sum(r_vec(:,1))/n_particles
         r_cm(2) = sum(r_vec(:,2))/n_particles
+        v_cm(1) = sum(v_vec(:,1))/n_particles
+        v_cm(2) = sum(v_vec(:,2))/n_particles
+    end subroutine
+
+    subroutine termal_bath(temp)
+        implicit none
+        real(8) :: temp
+        
     end subroutine
 
     subroutine calculate_accel()
