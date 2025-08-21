@@ -26,6 +26,7 @@ module initial_conditions
             integer :: i
             real(8) :: temp, disturb(n_particles, n_dim)
             call geometry()
+            v0_vec = 0d0
             if (is_noise) then
                 do i = 1, n_particles
                     call random_normal(disturb(i,1))

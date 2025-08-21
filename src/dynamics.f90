@@ -17,20 +17,42 @@ contains
     subroutine calculate_accel()
         implicit none
         integer :: i
-        real(8), dimension(:,:), allocatable :: new_r, r_versor, r_vector, disforce
+        real(8), dimension(:,:), allocatable :: new_r, r_versor, r_vector, disforce, new_r_versor
+        real(8), dimension(:), allocatable :: new_r_mod, kernel
 
         allocate(new_r(0:n_particles+1, n_dim))
-        allocate(r_versor(n_particles,n_dim))
-        allocate(r_vector(n_particles,n_dim))
+        allocate(new_r_mod(n_particles))     ! distancia entre particulas (auxiliar)
+        allocate(new_r_versor(n_particles, n_dim))  ! direccion entre partículas (auxiliar)
+        allocate(r_versor(n_particles,n_dim))  ! versor de la particula iesima respecto del CM
+        allocate(r_vector(n_particles,n_dim))   ! vector relativo entre las particulas (i, i+1) o (i, i-1)
         allocate(disforce(n_particles,n_dim))
-        ! Cyclic condition for particles
+        allocate(kernel(n_particles))
+        ! Cyclic condition for particles 
         new_r(1:n_particles,:) = r_vec
         new_r(0,:) = r_vec(n_particles,:)
         new_r(n_particles+1,:) = r_vec(1,:) 
-
-
-        ! vector (extension) for the elastic force (rest position in zero)
-        r_vector = (2d0*r_vec-new_r(0:n_particles-1,:)-new_r(2:n_particles+1,:))
+        a_vec = 0d0
+        !***********************************************************************************
+        ! Pseudo / Elastic acceleration calculation
+        !***********************************************************************************
+        ! ! vector (extension) for the elastic force (rest position in zero for relative coordinates)
+        ! ! This is useful for elastic forces where F_ij = r_ij r_ij(versor) where j = {i-1, i+1}
+        ! r_vector = (2d0*r_vec-new_r(0:n_particles-1,:)-new_r(2:n_particles+1,:))
+        r_vector = new_r(1:n_particles, : )-new_r(0:n_particles-1,:) ! r_(i,i-1) vector
+        new_r_mod = dsqrt(sum(r_vector**2, 2))
+        kernel = grad_potential(new_r_mod)
+        do i =1, n_dim
+            new_r_versor(:,i) = r_vector(1:n_particles,i)/new_r_mod(:)
+            a_vec(:,i) = - kernel * new_r_versor(:,i)
+        end do
+        r_vector = new_r(2:n_particles+1, : )-new_r(1:n_particles,:) ! r_(i,i-1) vector
+        new_r_mod = dsqrt(sum(r_vector**2, 2))
+        kernel = grad_potential(new_r_mod)
+        do i =1, n_dim
+            new_r_versor(:,i) = r_vector(1:n_particles,i)/new_r_mod(:)
+            a_vec(:,i) = a_vec(:,i) - kernel * new_r_versor(:,i)
+        end do
+        !***********************************************************************************
 
         !direction of each particle from the center of mass
         call get_r_cm()
@@ -51,17 +73,26 @@ contains
         ! end do
 
         ! call random_forces(disforce)
-        
-        a_vec = -k_m*r_vector
+
         a_vec = a_vec - drag_m * v_vec
         ! pressure is applied in the center of mass direction
         a_vec = a_vec + pressure*r_versor
         ! a_vec = a_vec + disforce
         
+
+        deallocate(new_r_mod)     ! distancia entre particulas (auxiliar)
+        deallocate(new_r_versor)  ! direccion entre partículas (auxiliar)
+        deallocate(r_vector)   ! vector relativo entre las particulas (i, i+1) o (i, i-1)
         deallocate(new_r)
         deallocate(r_versor)
         deallocate(disforce)
+        deallocate(kernel)
     end subroutine
+
+    REAL(8) ELEMENTAL FUNCTION grad_potential(R)
+        REAL(8), INTENT(IN) :: R  
+        grad_potential = 2d0* k_m/cut_dist * dtanh(R/cut_dist) * (1d0/dcosh(R/cut_dist)**2)
+    END FUNCTION grad_potential
 
     subroutine evolve_one_step(dt, method)
         implicit none
