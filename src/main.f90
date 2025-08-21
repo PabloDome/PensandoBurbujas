@@ -12,9 +12,11 @@ program n_springs
     n_dim = 2
     n_particles = 200
     R0 = 1d0
-    k_m = 10d0
-    drag_m = 0.5d0
-    temp_0 = 0.00025d0
+    k_m = 1000d0
+    cut_dist = 1d0
+    drag_m = 0.0d0
+    ! temp_0 = 0.00025d0
+    temp_0 = 0.d0
 
     allocate(r0_vec(n_particles, n_dim), r_vec(n_particles, n_dim))
     allocate(v_vec(n_particles, n_dim), v0_vec(n_particles, n_dim))
@@ -33,8 +35,7 @@ program n_springs
     ! end do
 
     ! initial positions of particles
-    call set_initial(.True., temp_0) ! distribuye las partículas en un poligono    
-    r_vec = r0_vec
+    call set_initial(.FALSE., temp_0) ! distribuye las partículas en un poligono    
     call calculate_accel()
     do i = 1, n_particles
         write(100,*)r_vec(i,1), r_vec(i,2)
@@ -49,14 +50,18 @@ program n_springs
     print*, '<vr>', v_rad_mean
     print*, 'T', T_mean
     write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
-    pressure = 0.d0
+    pressure = 0d0
     do i = 1, 50000
-        call evolve_one_step(0.01d0, 1)
+        call evolve_one_step(0.0001d0, 1)
         call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
         if(mod(i, 1) == 0) then
             write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
         end if
-       
+        print*, k_m, drag_m, pressure,cut_dist
+    end do
+
+    do i = 1, n_particles
+        write(300,*)r_vec(i,1), r_vec(i,2)
     end do
     call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
     print*, '<r>', r_mean
@@ -66,103 +71,101 @@ program n_springs
     print*, '<vr>', v_rad_mean
     print*, 'T', T_mean
 
-    do i = 1, 5000
-        call evolve_one_step(0.01d0, 1)
-        call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
-        if(mod(i, 1) == 0) then
-            write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
-        end if
-        if(mod(i, 1000) == 0) then
-            call termal_bath(temp_0)
-        end if
+    ! pressure = 0.0001d0
+    ! do i = 1, 500
+    !     call evolve_one_step(0.01d0, 1)
+    !     call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
+    !     if(mod(i, 1) == 0) then
+    !         write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
+    !     end if
+    !     if(mod(i, 1000) == 0) then
+    !         call termal_bath(temp_0)
+    !     end if
         
-    end do
-    temp_0 = 0.0025d0
+    ! end do
+    ! temp_0 = 0.0025d0
 
-    do i = 1, 5000
-        call evolve_one_step(0.01d0, 1)
-        call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
-        if(mod(i, 1) == 0) then
-            write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
-        end if
-        if(mod(i, 1000) == 0) then
-            call termal_bath(temp_0)
-        end if
+    ! do i = 1, 5000
+    !     call evolve_one_step(0.01d0, 1)
+    !     call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
+    !     if(mod(i, 1) == 0) then
+    !         write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
+    !     end if
+    !     if(mod(i, 1000) == 0) then
+    !         call termal_bath(temp_0)
+    !     end if
         
-    end do
+    ! end do
 
 
-    temp_0 = 0.025d0
-    do i = 1, 5000
-        call evolve_one_step(0.01d0, 1)
-        call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
-        if(mod(i, 1) == 0) then
-            write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
-        end if
-        if(mod(i, 1000) == 0) then
-            call termal_bath(temp_0)
-        end if
+    ! temp_0 = 0.025d0
+    ! do i = 1, 5000
+    !     call evolve_one_step(0.01d0, 1)
+    !     call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
+    !     if(mod(i, 1) == 0) then
+    !         write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
+    !     end if
+    !     if(mod(i, 1000) == 0) then
+    !         call termal_bath(temp_0)
+    !     end if
         
-    end do
+    ! end do
 
-    print*,'presure turned off'
-    do i = 1, n_particles
-        write(300,*)r_vec(i,1), r_vec(i,2)
-    end do
-    call get_r_cm()
-    print*,'after expansion 1', r_cm
+    ! print*,'presure turned off'
+    ! do i = 1, n_particles
+    !     write(300,*)r_vec(i,1), r_vec(i,2)
+    ! end do
+    ! call get_r_cm()
+    ! print*,'after expansion 1', r_cm
+
+    ! pressure = 0.0d0
+    ! do i = 1, 1000
+    !     call evolve_one_step(0.01d0, 1)
+    !     call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
+    !     if(mod(i, 1) == 0) then
+    !         write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
+    !     end if
+    ! end do
+
+    ! do i = 1, n_particles
+    !     write(400,*)r_vec(i,1), r_vec(i,2)
+    ! end do
+    ! call get_r_cm()
+    ! print*,'after expansion 2', r_cm
+
+
     stop
 
 
+    ! pressure = -0.005d0
+    ! do i = 1, 2000
+    !     call evolve_one_step(0.01d0, 1)
+    !     call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
+    !     if(mod(i, 1) == 0) then
+    !         write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
+    !     end if
+    ! end do
+    ! print*,'presure turned off'
 
 
+    ! do i = 1, n_particles
+    !     write(400,*)r_vec(i,1), r_vec(i,2)
+    ! end do
 
-    pressure = 0.0d0
-    do i = 1, 20000
-        call evolve_one_step(0.01d0, 1)
-        call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
-        if(mod(i, 1) == 0) then
-            write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
-        end if
-    end do
-
-    do i = 1, n_particles
-        write(400,*)r_vec(i,1), r_vec(i,2)
-    end do
-    call get_r_cm()
-    print*,'after expansion 2', r_cm
-    stop
-
-
-    pressure = -0.005d0
-    do i = 1, 2000
-        call evolve_one_step(0.01d0, 1)
-        call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
-        if(mod(i, 1) == 0) then
-            write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
-        end if
-    end do
-    print*,'presure turned off'
-
-
-    do i = 1, n_particles
-        write(400,*)r_vec(i,1), r_vec(i,2)
-    end do
-
-    pressure = 0d0
-    do i = 1, 20000
-        call evolve_one_step(0.01d0, 1)
-        call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
-        if(mod(i, 1) == 0) then
-            write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
-        end if
-        if (mod(i,2000) == 0) then
-            do j = 1, n_particles
-                write(i,*)r_vec(j,1), r_vec(j,2)
-            end do
-        end if
-    end do
-    do i = 1, n_particles
-        write(500,*)r_vec(i,1), r_vec(i,2)
-    end do
+    ! pressure = 0d0
+    ! do i = 1, 20000
+    !     call evolve_one_step(0.01d0, 1)
+    !     call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
+    !     if(mod(i, 1) == 0) then
+    !         write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
+    !     end if
+    !     if (mod(i,2000) == 0) then
+    !         do j = 1, n_particles
+    !             write(i,*)r_vec(j,1), r_vec(j,2)
+    !         end do
+    !     end if
+    ! end do
+    ! do i = 1, n_particles
+    !     write(500,*)r_vec(i,1), r_vec(i,2)
+    ! end do
 end program
