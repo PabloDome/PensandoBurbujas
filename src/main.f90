@@ -12,9 +12,9 @@ program n_springs
     n_dim = 2
     n_particles = 200
     R0 = 1d0
-    k_m = 1000d0
-    cut_dist = 1d0
-    drag_m = 0.0d0
+    k_m = 1d0
+    cut_dist = 0.1d0
+    drag_m = 0.2d0
     ! temp_0 = 0.00025d0
     temp_0 = 0.d0
 
@@ -50,8 +50,8 @@ program n_springs
     print*, '<vr>', v_rad_mean
     print*, 'T', T_mean
     write(200,*) r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean
-    pressure = 0d0
-    do i = 1, 50000
+    pressure = 0.5d0
+    do i = 1, 500000
         call evolve_one_step(0.0001d0, 1)
         call get_mean_values(r_mean, r_std, v_mean, v_std, v_rad_mean, T_mean)
         if(mod(i, 1) == 0) then

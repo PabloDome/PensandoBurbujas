@@ -45,7 +45,7 @@ contains
             new_r_versor(:,i) = r_vector(1:n_particles,i)/new_r_mod(:)
             a_vec(:,i) = - kernel * new_r_versor(:,i)
         end do
-        r_vector = new_r(2:n_particles+1, : )-new_r(1:n_particles,:) ! r_(i,i-1) vector
+        r_vector = new_r(1:n_particles,:)-new_r(2:n_particles+1, : ) ! r_(i,i-1) vector
         new_r_mod = dsqrt(sum(r_vector**2, 2))
         kernel = grad_potential(new_r_mod)
         do i =1, n_dim
